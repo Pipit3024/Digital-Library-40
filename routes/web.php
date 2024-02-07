@@ -22,6 +22,7 @@ use App\Http\Controllers\RegisterController;
 */
 // user
 Route::get('/', [HomeController::class, 'index']);
+Route::post('/', [HomeController::class, 'category']);
 Route::resource('/books', BookController::class);
 Route::resource('/booking', BookingController::class)->middleware('auth');
 

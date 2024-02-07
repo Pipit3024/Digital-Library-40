@@ -255,56 +255,43 @@
             <div class="categories-btn" data-aos="fade-up">
               <ul>
                 @foreach ($categories as $category)
-                @if ($category->id == 1)
-                <li><button id="btn-{{ $category->name }}" class="btn-category active" onclick="activateBtn(this)">{{ $category->name }}</button></li>
-                @else
-                <li><button id="btn-{{ $category->name }}" class="btn-category" onclick="activateBtn(this)">{{ $category->name }}</button></li>
-                @endif
+                <form action="/" method="post">
+                  @csrf
+                  <input type="hidden" name="selectedCategory" value="{{ $category->id }}">
+                  @if ($_POST)
+                  <li><button type="submit" id="btn-{{ $category->name }}" class="btn-category {{ ($category->id == $_POST['selectedCategory']) ? 'active' : '' }}" onclick="activateBtn(this)">{{ $category->name }}</button></li>
+                  @else
+                  <li><button type="submit" id="btn-{{ $category->name }}" class="btn-category" onclick="activateBtn(this)">{{ $category->name }}</button></li>
+                  @endif
+                </form>
                 @endforeach
               </ul>
             </div>
 
             <div class="content-wrapper" data-aos="fade-up" data-aos-anchor-placement="center-bottom">
-              {{-- fiksi --}}
               <div id="content-fiksi" class="content row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 justify-content-center">
-                @foreach ($books_fiksi as $book)
+                @if ($selectedCategory->count() > 0)
+                @foreach ($selectedCategory as $book)
+                    
                 <a href="/books/{{ $book->id }}" class="col-md-4 mt-4 text-decoration-none">
                   <div class="card">
-                      <div class="card-img-block">
-                        @if($book->cover)
-                        <img class="card-img-top" src="/storage/{{ $book->cover }}" alt="Card image cap">
-                        @else
-                        <img class="card-img-top" src="{{ asset('img/bookCoverDefault.png') }}" alt="Card image cap">
-                        @endif
+                    <div class="card-img-block">
+                      @if($book->cover)
+                      <img class="card-img-top" src="/storage/{{ $book->cover }}" alt="Card image cap">
+                      @else
+                      <img class="card-img-top" src="{{ asset('img/bookCoverDefault.png') }}" alt="Card image cap">
+                      @endif
                       </div>
                       <div class="card-body pt-0">
-                        <h5 class="card-title">{{ $book->title }} fiksi</h5>
+                        <h5 class="card-title">{{ $book->title }}</h5>
                         <p class="card-text">{{ $book->description }}</p>
                       </div>
                     </div>
                 </a>
                 @endforeach
-              </div>
-  
-              {{-- non fiksi --}}
-              <div id="content-nonfiksi" class="content row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 justify-content-center d-none">
-                @foreach ($books_fiksi as $book)
-                <a href="/books/{{ $book->id }}" class="col-md-4 mt-4 text-decoration-none">
-                  <div class="card">
-                      <div class="card-img-block">
-                        @if($book->cover)
-                        <img class="card-img-top" src="/storage/{{ $book->cover }}" alt="Card image cap">
-                        @else
-                        <img class="card-img-top" src="{{ asset('img/bookCoverDefault.png') }}" alt="Card image cap">
-                        @endif
-                      </div>
-                      <div class="card-body pt-0">
-                        <h5 class="card-title">{{ $book->title }} nonfiksi</h5>
-                        <p class="card-text">{{ $book->description }}</p>
-                      </div>
-                    </div>
-                </a>
-                @endforeach
+                @else
+                <p style="text-align: center; padding: 1rem; color: red">Buku dengan kategori ini sedang kosong</p>
+                @endif
               </div>
 
               <div class="more">
@@ -336,42 +323,4 @@
                 </div>
         </div>
     </section>
-@endsection
-
-@section('script')
-<script>
-  const categoriesBtn = document.getElementsByClassName('btn-category');
-  const contentFiksi = document.getElementById('content-fiksi');
-  const contentNonfiksi = document.getElementById('content-nonfiksi');
-
-  function activateBtn(e){
-    for(let i = 0; i < categoriesBtn.length; i++){
-      // remove previous active class
-      if(categoriesBtn[i].classList.contains('active')){
-        categoriesBtn[i].classList.remove('active');
-      }
-      e.classList.add('active');
-
-      if(categoriesBtn[i].classList.contains('active')){
-        let category = categoriesBtn[i].getAttribute('id');
-    
-        if(category == 'btn-fiksi'){
-          contentFiksi.classList.remove('d-none');
-          contentNonfiksi.classList.add('d-none');
-        } else if(category == 'btn-non-fiksi'){
-          contentFiksi.classList.add('d-none');
-          contentNonfiksi.classList.remove('d-none');
-        }
-      }
-    }
-    anime({
-      targets: 'section.categories .content',
-      translateY: [100, 0],
-      opacity: [0, 100],
-      duration: 1800,
-    });
-  }
-
-
-</script>
 @endsection
