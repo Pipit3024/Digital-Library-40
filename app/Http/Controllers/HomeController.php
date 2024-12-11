@@ -8,26 +8,29 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    // Method untuk menampilkan halaman utama
     public function index()
     {
         return view('index', [
             'categories' => Category::all(),
-            // 'books_fiksi' => Book::where('category_id', 1)->take(4)->get(),
-            // 'books_nonfiksi' => Book::where('category_id', 2)->take(4)->get(),
-            'selectedCategory' => Book::where('category_id', 1)->take(4)->get(),
+            'selectedCategory' => Book::where('category_id', 1)->take(4)->get(), // Default kategori
         ]);
     }
 
-    public function category()
+    // Method untuk filter berdasarkan kategori
+    public function category(Request $request)
     {
-        if ($_POST) {
-            $selectedCategory = $_POST['selectedCategory'];
-        }
+        // Validasi input untuk memastikan category_id adalah angka
+        $validatedData = $request->validate([
+            'selectedCategory' => 'required|integer|exists:categories,id',
+        ]);
+
+        // Ambil kategori yang dipilih
+        $selectedCategory = $validatedData['selectedCategory'];
+
         return view('index', [
             'categories' => Category::all(),
-            // 'books_fiksi' => Book::where('category_id', 1)->take(4)->get(),
-            // 'books_nonfiksi' => Book::where('category_id', 2)->take(4)->get(),
-            'selectedCategory' => Book::where('category_id', $selectedCategory)->take(4)->get()
+            'selectedCategory' => Book::where('category_id', $selectedCategory)->take(4)->get(),
         ]);
     }
 }
